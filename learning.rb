@@ -1,10 +1,10 @@
-require "yaml"
-require "pp"
+require 'yaml'
+require 'pp'
 
 class Learning
   def initialize
     begin
-      @dictionary=YAML.load_file"dictionary.yaml"
+      @dictionary=YAML.load_file'DICTIONARY.yaml'
       pp @dictionary
     rescue
       @dictionary={}
@@ -12,16 +12,16 @@ class Learning
   end
 
   def ask
-    puts "何か言葉を教えて。"
-    print "単語>"
+    puts '何か言葉を教えて。'
+    print '単語>'
     @word=gets.chomp
-    print "意味>"
+    print '意味>'
     @mean=gets.chomp
-    puts "「" + @word + "」とは「" + @mean + "」という意味なのね。覚えたわ。"
+    puts '「' + @word + '」とは「' + @mean + '」という意味なのね。覚えたわ。'
 
     @dictionary[@word]=@mean
 
-    YAML.dump(@dictionary,File.open("dictionary.yaml", "w"))
+    YAML.dump(@dictionary,File.open('DICTIONARY.yaml', 'w'))
   end
 end
 
