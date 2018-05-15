@@ -1,11 +1,16 @@
-names=[]
-arr_num=0
-File.open("text_write_test.txt","r") do |text|
-  text.each_line do |line|
-    names[arr_num] = line
-    puts names[arr_num]
-    arr_num +=1
+require 'yaml'
+require 'pp'
+
+class Greeting
+  def initialize
+    begin
+      names=YAML.load_file'NAMES.yaml'
+      puts names['master'].chomp + "、"+names['yome'].chomp+"をお呼びですか？"
+      pp @names
+    rescue
+      puts "先に無脳ちゃんに名前をつけてあげてください。"
+    end
   end
 end
 
-puts names[1].chomp + "様、"+names[0].chomp+"をお呼びですか？"
+Greeting.new
