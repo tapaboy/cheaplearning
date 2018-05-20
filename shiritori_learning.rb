@@ -31,6 +31,3 @@ class Shiritori_Learning
     YAML.dump(@dictionary,File.open('DICTIONARY.yaml', 'w'))
   end
 end
-
-shiritori_learning=Shiritori_Learning.new
-shiritori_learning.ask

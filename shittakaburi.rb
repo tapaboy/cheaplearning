@@ -19,6 +19,3 @@ class Sittakaburi
     puts '嫁>それは「'+@dictionary[@word]+'」という意味なのよ。私って物知りでしょ？'
   end
 end
-
-sittakaburi=Sittakaburi.new
-sittakaburi.teach

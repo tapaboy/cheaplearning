@@ -24,6 +24,3 @@ class Learning
     YAML.dump(@dictionary,File.open('DICTIONARY.yaml', 'w'))
   end
 end
-
-learn=Learning.new
-learn.ask

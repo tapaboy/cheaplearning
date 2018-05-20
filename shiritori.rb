@@ -100,7 +100,3 @@ class Shiritori
     end
   end
 end
-
-#### 実際にオブジェクトを作ってプレイする
-shiritori=Shiritori.new
-shiritori.play
