@@ -1,7 +1,7 @@
 require 'yaml'
 require 'pp'
 
-class Sittakaburi
+class Shittakaburi
   def initialize
     begin
       @dictionary=YAML.load_file'DICTIONARY.yaml'

@@ -10,34 +10,29 @@ class Greeting
   def initialize
     begin
       @names=YAML.load_file'NAMES.yaml'
-      puts @names['yome']+'> '+ @names['master'] + '様、今日もお会いできてうれしいです。'
+      puts @names['yome']+'> '+ @names['master'] + '、何か用事なの？私だって忙しんだからね。でも、ちょっとだけならつきあってあげてもいいわよ。'
     rescue
       puts 'まず無脳ちゃんに名前をつけてあげてください。'
       meimei
-      puts @names['yome']+'> '+ @names['master'] + '様、お会いできてうれしいです。よろしくお願いします。'
+      puts @names['yome']+'> 別に'+ @names['master'] + 'と知り合いになってもうれしくもないんだかれね。だけど、一応よろしくね。'
     end
   end
 
-
-
-#  def talk
-#    talk=[[Shiritori,],
-#          [Learning,''],
-#          [Shiritori_Learning,'しりとりに出てきた言葉の意味を教えてください。'],
-#          [Shittakaburi,'言葉の意味を教えてあげましょう。']
-#        ]
-#    puts @names['yome']+'> それでは、'+talk[rand(4)][1]
-#  return  Shittakaburi.new
-#  end
   def talking
-    talk = rand(2)
+    talk = rand(4)
     case talk
     when 0
-      puts @names['yome']+'> '+ 'しりとりをしましょう。'
+      puts @names['yome']+'> '+ 'しりとりでもする？勘違いしないでよね。ただの暇つぶしよ。ヒマツブシ。'
       Shiritori.new.play
     when 1
-      puts @names['yome']+'> '+ '何か言葉を教えてください。'
+      puts @names['yome']+'> '+ '何か言葉を教えてよ。まあ、あなたじゃ大した語彙なさそうだけどね。'
       Learning.new.ask
+    when 2
+      puts @names['yome']+'> '+ 'ちょっと、前しりとりに出てきた言葉の意味教えなさいよ。'
+      Shiritori_Learning.new.ask
+    when 3
+      puts @names['yome']+'> '+ @names['master'] + 'はあまり言葉知らなそうだから、私が少し教えてあげるわ。'
+      Shittakaburi.new.teach
     end
   end
 end
