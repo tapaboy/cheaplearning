@@ -5,7 +5,7 @@ class Learning
   def initialize
     begin
       @dictionary=YAML.load_file'DICTIONARY.yaml'
-      pp @dictionary
+#      pp @dictionary
     rescue
       @dictionary={}
     end
