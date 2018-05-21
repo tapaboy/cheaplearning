@@ -10,11 +10,11 @@ class Greeting
   def initialize
     begin
       @names=YAML.load_file'NAMES.yaml'
-      puts @names['yome']+'> '+ @names['master'] + '、何か用事なの？私だって忙しんだからね。でも、ちょっとだけならつきあってあげてもいいわよ。'
+      puts @names['yome'] + '> ' + @names['master'] + '、何か用事なの？私だって忙しんだからね。でも、ちょっとだけならつきあってあげてもいいわよ。'
     rescue
       puts 'まず無脳ちゃんに名前をつけてあげてください。'
       meimei
-      puts @names['yome']+'> 別に'+ @names['master'] + 'と知り合いになってもうれしくもないんだかれね。だけど、一応よろしくね。'
+      puts @names['yome'] + '> 別に' + @names['master'] + 'と知り合いになってもうれしくもないんだかれね。だけど、一応よろしくね。'
     end
   end
 

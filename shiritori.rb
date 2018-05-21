@@ -3,6 +3,7 @@ require 'pp'
 
 class Shiritori
   def initialize
+    @names=YAML.load_file'NAMES.yaml'
 
     #### 初めからPCが答えられる言葉を用意してあげる。
     @pc_wordsbank = ['ごりら','ぱんだ','ごま','めだか','かばん','ごりら']
@@ -47,12 +48,12 @@ class Shiritori
   def pc_play
     @pc_wordsbank.each do |w|
       if w[0] == @tail
-        puts '嫁> ' + w
+        puts @names['yome'] + '> ' + w
         @pc_wordsbank.delete(w)
         return w
       end
     end
-    puts '嫁> ごめんなさい。「' + @tail + '」で始まる言葉を思い付きません。私の負けです。'
+    puts @names['yome'] + '> うぅ〜、「' + @tail + '」で始まる言葉を思い出せないわ。しかたないわね。今回だけは負けを認めてあげるわ。'
     @store_words
     exit
   end
@@ -63,14 +64,14 @@ class Shiritori
   ## すでに使われた単語か判断。
     @wordsbank.each do |w|
       if w == @word
-        puts 'その言葉はもう出てます。あなたの負けです。'
+        puts 'その言葉はもう出てます。残念でした。'
         store_words
       end
     end
 
     ## 「ん」で終わっていないか判断
     if @word[-1] == 'ん'
-      puts '最後の言葉が「ん」です。あなたの負けです。'
+      puts '最後の言葉が「ん」です。残念でした。'
       @wordsbank.push(@word)
       store_words
     ## 前の単語の最後の文字で始まっていれば正常処理
@@ -80,7 +81,7 @@ class Shiritori
       return @word[-1]
     ## 前の言葉の最後の言葉と違う言葉で始まっていれば負け判定
     else
-      puts @tail + 'で始まる言葉ではありません。あなたの負けです。'
+      puts @tail + 'で始まる言葉ではありません。残念でした。'
       @wordsbank.push(@word)
       store_words
     end
@@ -88,7 +89,7 @@ class Shiritori
 
   def play
     #### 試合開始
-    puts 'はじめはあなたからどうぞ'
+    puts 'はじめは' + @names['master'] + 'からどうぞ'
     @word=human_play
     @tail=@word[0]
 
