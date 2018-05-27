@@ -1,6 +1,5 @@
 require 'yaml'
 require 'pp'
-require './meimei'
 require './shiritori'
 require './learning'
 require './shiritori_learning'
@@ -12,8 +11,6 @@ begin
   Ore = names[1]
   puts "#{Yome}> #{Ore}、何か用事なの？私だって忙しんだからね。でも、ちょっとだけならつきあってあげてもいいわよ。"
 rescue
-  names={}
-
   puts '私の名前は？'
   Yome = gets.chomp
   puts "私の名前は#{Yome}っていうの？"
