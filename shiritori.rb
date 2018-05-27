@@ -48,13 +48,13 @@ class Shiritori
   def pc_play
     @pc_wordsbank.each do |w|
       if w[0] == @tail
-        puts @names['yome'] + '> ' + w
+        puts "#{Yome}> " + w
         @pc_wordsbank.delete(w)
         return w
       end
     end
     puts "#{Yome}> うぅ〜、「#{@tail}」で始まる言葉を思い出せないわ。しかたないわね。今回だけは負けを認めてあげるわ。"
-    @store_words
+    store_words
     exit
   end
 
