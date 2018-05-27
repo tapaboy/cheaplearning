@@ -40,7 +40,7 @@ class Shiritori
 
   ####人間側の設定（キーボードから入力した文字を返すだけ。）
   def human_play
-    print '俺> '
+    print "#{Ore}> "
     return gets.chomp
   end
 
@@ -53,7 +53,7 @@ class Shiritori
         return w
       end
     end
-    puts @names['yome'] + '> うぅ〜、「' + @tail + '」で始まる言葉を思い出せないわ。しかたないわね。今回だけは負けを認めてあげるわ。'
+    puts "#{Yome}> うぅ〜、「#{@tail}」で始まる言葉を思い出せないわ。しかたないわね。今回だけは負けを認めてあげるわ。"
     @store_words
     exit
   end
@@ -64,24 +64,24 @@ class Shiritori
   ## すでに使われた単語か判断。
     @wordsbank.each do |w|
       if w == @word
-        puts 'その言葉はもう出てます。残念でした。'
+        puts '謎の中の人> その言葉はもう出てます。残念でした。'
         store_words
       end
     end
 
     ## 「ん」で終わっていないか判断
     if @word[-1] == 'ん'
-      puts '最後の言葉が「ん」です。残念でした。'
+      puts '謎の中の人> 最後の言葉が「ん」です。残念でした。'
       @wordsbank.push(@word)
       store_words
     ## 前の単語の最後の文字で始まっていれば正常処理
     elsif @word[0] == @tail
       @wordsbank.push(@word)
-      puts '次は「' + @word[-1] + '」で始まる言葉'
+      puts "次は「#{@word[-1]}」で始まる言葉"
       return @word[-1]
     ## 前の言葉の最後の言葉と違う言葉で始まっていれば負け判定
     else
-      puts @tail + 'で始まる言葉ではありません。残念でした。'
+      puts "謎の中の人> 「#{@tail}」で始まる言葉ではありません。残念でした。"
       @wordsbank.push(@word)
       store_words
     end
@@ -89,7 +89,7 @@ class Shiritori
 
   def play
     #### 試合開始
-    puts 'はじめは' + @names['master'] + 'からどうぞ'
+    puts "#{Yome}> はじめは#{Ore}からどうぞ"
     @word=human_play
     @tail=@word[0]
 

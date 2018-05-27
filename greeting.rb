@@ -6,36 +6,37 @@ require './learning'
 require './shiritori_learning'
 require './shittakaburi'
 
-class Greeting
-  def initialize
-    begin
-      @names = YAML.load_file'NAMES.yaml'
-      puts "#{@names['yome']}> #{@names['master']}、何か用事なの？私だって忙しんだからね。でも、ちょっとだけならつきあってあげてもいいわよ。"
-    rescue
-      puts 'まず無脳ちゃんに名前をつけてあげてください。'
-      meimei
-      puts "#{@names['yome']}> 別に#{@names['master']}と知り合いになってもうれしくもないんだかれね。だけど、一応よろしくね。"
-    end
-  end
+begin
+  names = YAML.load_file'NAMES.yaml'
+  Yome = names[0]
+  Ore = names[1]
+  puts "#{Yome}> #{Ore}、何か用事なの？私だって忙しんだからね。でも、ちょっとだけならつきあってあげてもいいわよ。"
+rescue
+  names={}
 
-  def talking
-    talk = rand(4)
-    case talk
-    when 0
-      puts "#{@names['yome']}> しりとりでもする？あ、勘違いしないでよね。ただの暇つぶしよ。ヒマツブシ。"
-      Shiritori.new.play
-    when 1
-      puts "#{@names['yome']}> 何か言葉を教えてよ。ま、あなたじゃ大した語彙なさそうだけどね。"
-      Learning.new.ask
-    when 2
-      puts "#{@names['yome']}> ちょっと、前しりとりに出てきた言葉の意味教えなさいよ。"
-      Shiritori_Learning.new.ask
-    when 3
-      puts "#{@names['yome']}> #{@names['master']}はあまり言葉知らなそうだから、私が少し教えてあげるわ。"
-      Shittakaburi.new.teach
-    end
-  end
+  puts '私の名前は？'
+  Yome = gets.chomp
+  puts "私の名前は#{Yome}っていうの？"
+  puts 'あなたをなんと呼べばいいの？'
+  Ore = gets.chomp
+  puts "#{Ore}でいいのね？"
+
+  YAML.dump([Yome, Ore],File.open("NAMES.yaml", "w"))
+  puts "#{Yome}> 別に#{Ore}と知り合いになってもうれしくもないんだかれね。だけど、一応よろしくね。"
 end
 
-session = Greeting.new
-session.talking
+talk = rand(4)
+case talk
+when 0
+  puts "#{Yome}> しりとりでもする？あ、勘違いしないでよね。ただの暇つぶしよ。ヒマツブシ。"
+  Shiritori.new.play
+when 1
+  puts "#{Yome}> 何か言葉を教えてよ。ま、あなたじゃ大した語彙なさそうだけどね。"
+  Learning.new.ask
+when 2
+  puts "#{Yome}> ちょっと、前しりとりに出てきた言葉の意味教えなさいよ。"
+  Shiritori_Learning.new.ask
+when 3
+  puts "#{Yome}> #{Ore}はあまり言葉知らなそうだから、私が少し教えてあげるわ。"
+  Shittakaburi.new.teach
+end
