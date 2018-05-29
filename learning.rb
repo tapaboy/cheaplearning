@@ -43,11 +43,9 @@ class Learning
         key2 = parsed_str[1]
         val = parsed_str[2]
         keys = [key1, key2]
-
         markov_dic[keys] = [markov_dic[keys], val].compact.flatten.uniq
         parsed_str.shift
     end
-    pp markov_dic
 
     YAML.dump(markov_dic,File.open('MARKOV_DIC.yaml', 'w'))
   end
