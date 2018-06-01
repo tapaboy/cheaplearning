@@ -35,7 +35,7 @@ class Learning
     begin
       markov_dic = YAML.load_file'MARKOV_DIC.yaml'
     rescue
-      markov_dic = {}
+      markov_dic = []
     end
     cycle = parsed_str.size - 3
     cycle.times do |key1, key2, val|
@@ -43,10 +43,13 @@ class Learning
         key2 = parsed_str[1]
         val = parsed_str[2]
         keys = [key1, key2]
-        markov_dic[keys] = [markov_dic[keys], val].compact.flatten.uniq
+        cell_arr = [keys, val]
+        markov_dic.push cell_arr
         parsed_str.shift
     end
 
+    markov_dic.uniq!
+    pp markov_dic
     YAML.dump(markov_dic,File.open('MARKOV_DIC.yaml', 'w'))
   end
 end
