@@ -1,6 +1,5 @@
-#### なんとなくうまくいきそう
-
 require 'yaml'
+require 'natto'
 require 'pp'
 
 
@@ -25,6 +24,17 @@ end
 
 puts "嫁> なんでもいいから私に聞いてみなさい。"
 print "俺> "
-keyword = gets.chomp
+str = gets.chomp
+ore_words = []
+
+parse_ore = Natto::MeCab.new
+parse_ore.parse(str) do |line|
+  if line.feature =~ /固有名詞/ || line.feature =~ /名詞,サ変接続/ || line.feature =~ /名詞,一般/
+    ore_words.push line.surface
+  end
+end
+keyword = ore_words[rand(ore_words.size)]
+puts keyword
+
 make_stings keyword
 puts @yome_strings.join + "わかった？"
