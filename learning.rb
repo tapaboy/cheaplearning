@@ -49,7 +49,6 @@ class Learning
     end
 
     markov_dic.uniq!
-    pp markov_dic
     YAML.dump(markov_dic,File.open('MARKOV_DIC.yaml', 'w'))
   end
 end
