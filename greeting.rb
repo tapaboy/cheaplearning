@@ -4,6 +4,7 @@ require './shiritori'
 require './learning'
 require './shiritori_learning'
 require './shittakaburi'
+require './dialogue'
 
 begin
   names = YAML.load_file'NAMES.yaml'
@@ -22,7 +23,7 @@ rescue
   puts "#{Yome}> 別に#{Ore}と知り合いになってもうれしくもないんだかれね。だけど、一応よろしくね。"
 end
 
-talk = rand(4)
+talk = rand(5)
 case talk
 when 0
   puts "#{Yome}> しりとりでもする？あ、勘違いしないでよね。ただの暇つぶしよ。ヒマツブシ。"
@@ -36,4 +37,6 @@ when 2
 when 3
   puts "#{Yome}> #{Ore}はあまり言葉知らなそうだから、私が少し教えてあげるわ。"
   Shittakaburi.new.teach
+when 4
+  Dialogue.new.make_dialogue
 end
