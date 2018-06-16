@@ -4,7 +4,11 @@ require 'pp'
 
 class Dialogue
   def initialize
-    @markov_dic = YAML.load_file'MARKOV_DIC.yaml'
+    begin
+      @markov_dic = YAML.load_file'MARKOV_DIC.yaml'
+    rescue
+      @markov_dic = []
+    end
     @yome_strings = ["#{Yome}> え！？　そんなこと私に聞くの？　嘘でしょ？　もー、信じらんない！　"]
   end
 
