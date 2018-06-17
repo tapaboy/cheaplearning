@@ -5,9 +5,17 @@ try to make personal artificial incompetence.
 https://wikiwiki.jp/deepforget/
 と連携してます。
 
+## あらかじめインストールすべきもの
+### パソコン本体にインストールするもの
+- ruby、ruby-dev このアプリは,rubyで作っています。
+- mecab、libmecab-dev、mecab-ipadic-utf8　形態素解析にmecabを使っています。mecab-ipadic-utf8は、形態素解析に必要な辞書です。必ず「-utf8」がついているものをインストールしてください。
+- （任意）NEologd　最近の書籍やテレビ番組（アニメ）のタイトル等も入っている辞書で、頻繁に更新されています。Githubからダウンロードしてインストールします。なお、NEologdより先にcurlをインストールしておく必要があります。
+
+### Ruby付属のgemコマンドでインストールするもの
+- rake、mecab、gtk3、natto　rakeは後のものをインストールするために必要なので最初にインストールします。Rubyでmecabを使うためにはgemでもインストールしておく必要があります。gtk3はGUIを作るための道具。nattoはmecabをより使いやすくするもの。
+
 ## とりあえず使ってみる。
-- ファイルを置いてあるディレクトリに移動して、"$ ruby greetin.rb"
-  とコマンドを実行してください。
+- ファイルを置いてあるディレクトリに移動して、"$ ruby greetin.rb" とコマンドを実行してください。
 - なお、現在 gui.rb は単独で動きます。
 
 ## 既知の問題
