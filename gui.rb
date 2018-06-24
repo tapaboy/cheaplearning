@@ -2,6 +2,16 @@ require 'gtk3'
 require 'yaml'
 require 'natto'
 require 'pp'
+require 'open_jtalk'
+
+def yome_talk
+  OpenJtalk.load(OpenJtalk::Config::Mei::FAST) do |openjtalk|
+    header, data = openjtalk.synthesis(openjtalk.normalize_text(@output))
+    OpenJtalk::WaveFileWriter.save('yome.wav', header, data)
+    `aplay yome.wav`
+  end
+#  File.delete 'yome.wav'
+end
 
 #### Ui クラスを定義
 class Ui
@@ -30,7 +40,7 @@ class Ui
     yome_area.set_size_request(240, -1)
     yome_area.set_cursor_visible(false)
     yome_area.set_editable(false)
-    yome_area.buffer.text = 'ヨメ（仮）> 何か用事なの？私だって忙しんだからね。そうそう『バイバイ」でさよならよ。'
+    yome_area.buffer.text = '何か用事なの？私だって忙しんだからね。そうそう『バイバイ」でさよならよ。'
 
     ore_area = Gtk::Entry.new
     ore_area.set_size_request(240, -1)
@@ -39,13 +49,14 @@ class Ui
       if @entry == 'バイバイ' || @entry == 'ばいばい'
         puts @entry
         YAML.dump(@markov_dic, File.open('MARKOV_DIC.yaml', 'w'))
-        yome_area.buffer.text = 'ヨメ（仮）> じゃ、またね。　×を押して終了してね。'
+        yome_area.buffer.text = 'じゃ、またね。　×を押して終了してね。'
         exit
       end
       ore_strings
       yome_strings
       yome_area.buffer.text = @output
       e.text = ''
+      yome_talk
     end
 
     vbox.pack_start(ibox, expand: true, fill: true, padding: 0)
@@ -91,7 +102,7 @@ class Ui
   end
 
   def yome_strings
-    @yome_strings = ['ヨメ（仮）> え！？　嘘でしょ？　もー、信じらんない！　']
+    @yome_strings = ['え！？　嘘でしょ？　もー、信じらんない！　']
     @markov_dic.each do |line|
       if line[0][0] == @keyword
         if @keyword == '。' || @keyword == '？'
