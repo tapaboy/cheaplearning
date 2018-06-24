@@ -70,8 +70,6 @@ class Dialogue
     @yome_strings = ["#{Yome}> "]
   end
 
-#    yome_strings @keyword
-
   def make_dialogue
     puts "#{Yome}> なんでもいいから私に聞いてみなさい。"
     while true

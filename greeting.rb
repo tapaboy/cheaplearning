@@ -7,7 +7,7 @@ require './shittakaburi'
 require './dialogue'
 
 begin
-  names = YAML.load_file'NAMES.yaml'
+  names = YAML.load_file 'NAMES.yaml'
   Yome = names[0]
   Ore = names[1]
   puts "#{Yome}> #{Ore}、何か用事なの？私だって忙しんだからね。でも、ちょっとだけならつきあってあげてもいいわよ。"
@@ -18,8 +18,7 @@ rescue
   puts 'あなたをなんと呼べばいいの？'
   Ore = gets.chomp
   puts "#{Ore}でいいのね？"
-
-  YAML.dump([Yome, Ore],File.open("NAMES.yaml", "w"))
+  YAML.dump([Yome, Ore], File.open('NAMES.yaml', 'w'))
   puts "#{Yome}> 別に#{Ore}と知り合いになってもうれしくもないんだかれね。だけど、一応よろしくね。"
 end
 
