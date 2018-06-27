@@ -4,15 +4,6 @@ require 'natto'
 require 'pp'
 require 'open_jtalk'
 
-def yome_talk
-  OpenJtalk.load(OpenJtalk::Config::Mei::FAST) do |openjtalk|
-    header, data = openjtalk.synthesis(openjtalk.normalize_text(@output))
-    OpenJtalk::WaveFileWriter.save('yome.wav', header, data)
-    `aplay yome.wav`
-  end
-#  File.delete 'yome.wav'
-end
-
 #### Ui クラスを定義
 class Ui
   def initialize
@@ -40,7 +31,9 @@ class Ui
     yome_area.set_size_request(240, -1)
     yome_area.set_cursor_visible(false)
     yome_area.set_editable(false)
-    yome_area.buffer.text = '何か用事なの？私だって忙しんだからね。そうそう『バイバイ」でさよならよ。'
+    @output = '何か用事なの？私だって忙しんだからね。そうそう『バイバイ」でさよならよ。'
+    yome_area.buffer.text = "ヨメ> #{@output}"
+    yome_talk
 
     ore_area = Gtk::Entry.new
     ore_area.set_size_request(240, -1)
@@ -49,12 +42,14 @@ class Ui
       if @entry == 'バイバイ' || @entry == 'ばいばい'
         puts @entry
         YAML.dump(@markov_dic, File.open('MARKOV_DIC.yaml', 'w'))
-        yome_area.buffer.text = 'じゃ、またね。　×を押して終了してね。'
+        @output = 'じゃ、またね。バイバイ'
+        yome_area.buffer.text = "ヨメ> #{@output}"
+        yome_talk
         exit
       end
       ore_strings
       yome_strings
-      yome_area.buffer.text = @output
+      yome_area.buffer.text = "ヨメ> #{@output}"
       e.text = ''
       yome_talk
     end
@@ -68,6 +63,8 @@ class Ui
     win.show_all
     Gtk.main
   end
+
+  private
 
   def ore_strings
     ## 単語分割し、配列に代入
@@ -101,6 +98,7 @@ class Ui
     @keyword = ore_words[rand(ore_words.size)]
   end
 
+  #### ときどきあるはずのない引数を受け取って突然死する。
   def yome_strings
     @yome_strings = ['え！？　嘘でしょ？　もー、信じらんない！　']
     @markov_dic.each do |line|
@@ -119,6 +117,15 @@ class Ui
     @yome_strings.push '　バカ、死ね、カス！'
     @output = @yome_strings.join
     @yome_strings = ['ヨメ（仮）> ']
+  end
+
+  def yome_talk
+    OpenJtalk.load(OpenJtalk::Config::Mei::FAST) do |openjtalk|
+      header, data = openjtalk.synthesis(openjtalk.normalize_text(@output))
+      OpenJtalk::WaveFileWriter.save('yome.wav', header, data)
+      `aplay yome.wav`
+    end
+    #  File.delete 'yome.wav'
   end
 end
 
