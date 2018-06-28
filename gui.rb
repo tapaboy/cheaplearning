@@ -102,17 +102,16 @@ class Ui
   def yome_strings
     @yome_strings = ['え！？　嘘でしょ？　もー、信じらんない！　']
     @markov_dic.each do |line|
-      if line[0][0] == @keyword
-        if @keyword == '。' || @keyword == '？'
-          @yome_strings.push @keyword
-          break
-        end
-        @yome_strings.push line[0][0]
-        @yome_strings.push line[0][1]
-        @keyword = line[1]
-        next if @keyword != line[0][0]
-        yome_strings @keyword
+      next unless line[0][0] == @keyword
+      if @keyword == '。' || @keyword == '？'
+        @yome_strings.push @keyword
+        break
       end
+      @yome_strings.push line[0][0]
+      @yome_strings.push line[0][1]
+      @keyword = line[1]
+      next if @keyword != line[0][0]
+      yome_strings @keyword
     end
     @yome_strings.push '　バカ、死ね、カス！'
     @output = @yome_strings.join
@@ -120,12 +119,14 @@ class Ui
   end
 
   def yome_talk
-    OpenJtalk.load(OpenJtalk::Config::Mei::FAST) do |openjtalk|
-      header, data = openjtalk.synthesis(openjtalk.normalize_text(@output))
-      OpenJtalk::WaveFileWriter.save('yome.wav', header, data)
-      `aplay yome.wav`
+    if ARGV[0] == '-v'
+      OpenJtalk.load(OpenJtalk::Config::Mei::FAST) do |openjtalk|
+        header, data = openjtalk.synthesis(openjtalk.normalize_text(@output))
+        OpenJtalk::WaveFileWriter.save('yome.wav', header, data)
+        `aplay yome.wav`
+      end
+      #  File.delete 'yome.wav'
     end
-    #  File.delete 'yome.wav'
   end
 end
 
