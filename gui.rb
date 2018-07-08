@@ -142,7 +142,15 @@
     #### OpenJtalkで音声を出す。
     def yome_talk
       if ARGV[0] == '-v'
-        OpenJtalk.load(OpenJtalk::Config::Mei::FAST) do |openjtalk|
+        mode = [OpenJtalk::Config::Mei::ANGRY,
+                OpenJtalk::Config::Mei::BASHFUL,
+                OpenJtalk::Config::Mei::HAPPY,
+                OpenJtalk::Config::Mei::SAD,
+                OpenJtalk::Config::Mei::FAST,
+                OpenJtalk::Config::Mei::SLOW,
+                OpenJtalk::Config::Mei::HIGH,
+                OpenJtalk::Config::Mei::LOW]
+          OpenJtalk.load(mode[rand(8)]) do |openjtalk|
           header, data = openjtalk.synthesis(openjtalk.normalize_text(@output))
           OpenJtalk::WaveFileWriter.save('yome.wav', header, data)
           `aplay yome.wav`
