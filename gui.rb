@@ -20,7 +20,7 @@
       #### 次のコードで「閉じる」を押すと、プログラムは終了。
       win.signal_connect('destroy') { Gtk.main_quit }
       win.set_border_width(10)
-      win.width_request = 400
+      win.width_request = 640
 
       #### 透過性
       ## 枠と上のボタン類を表示しない
@@ -41,15 +41,16 @@
       ibox.override_background_color(0, color)
 
       @yome_area = Gtk::TextView.new
-      @yome_area.set_size_request(240, -1)
+      @yome_area.set_size_request(380, -1)
       @yome_area.set_cursor_visible(false)
       @yome_area.set_editable(false)
+      @yome_area.set_wrap_mode(1)
       @output = '何か用事なの？私だって忙しんだからね。そうそう『バイバイ」でさよならよ。'
       @yome_area.buffer.text = "ヨメ> #{@output}"
       yome_talk
 
       @ore_area = Gtk::Entry.new
-      @ore_area.set_size_request(240, -1)
+      @ore_area.set_size_request(380, -1)
       @ore_area.max_length = 80
       ore_imput
 
@@ -87,9 +88,14 @@
       ## 単語分割し、配列に代入
       parse_ore = Natto::MeCab.new
       parsed_str = []
-      parse_ore.parse(@entry) do |line|
+      parse_ore.parse(@entry.chomp) do |line|
         parsed_str.push line.surface
       end
+      ## 不要な記号を抜く。
+#      parsed_str.delete('、')
+      parsed_str.delete('「')
+      parsed_str.delete('」')
+      parsed_str.delete('　')
 
       ## マルコフ連鎖用辞書に収録
       cycle = parsed_str.size - 3
@@ -119,10 +125,11 @@
     #### なお、ときどきあるはずのない引数を受け取って突然死するのを防止するため(*)で引数を取れるようにする。
     def yome_strings (*)
       beginning = ['え！？　嘘でしょ？　もー、信じらんない！　', 'もー、そんなこと私に聞くの？　', 'しかたないわね、　']
+      @markov_dic.shuffle!
       @yome_strings = [beginning[rand(beginning.size)]]
       @markov_dic.each do |line|
         next unless line[0][0] == @keyword
-        if @keyword == '。' || @keyword == '？'
+        if @keyword == '。' || @keyword == '？' || @keyword == '！'
           @yome_strings.push @keyword
           break
         end
