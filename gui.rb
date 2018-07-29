@@ -82,7 +82,7 @@ class Ui
         exit
       end
       ore_strings
-      yome_strings
+      yome_strings(@keyword)
       e.text = ''
     end
   end
@@ -132,20 +132,40 @@ class Ui
 
   #### 無脳ちゃんの言葉を作成する。
   #### なお、ときどきあるはずのない引数を受け取って突然死するのを防止するため(*)で引数を取れるようにする。
-  def yome_words(keyword)
-    puts "keyword B is #{keyword}"
-    @yome_strings.push keyword
 
+  def yome_strings(keyword)
     #pp @noun_relation
     ## 特定の単語を含む配列をみつける
-    selected_mkv_dic = []
+    @selected_mkv_dic = []
     @markov_dic.each do |item|
-      item.include?(@noun_relation[0]) && selected_mkv_dic.push(item)
+      item.each do |sub_item|
+        @noun_relation.include?(sub_item) && @selected_mkv_dic.push(item)
+      end
     end
-    # pp selected_mkv_dic
+    pp @selected_mkv_dic
 
-    @markov_dic.shuffle!
-    @markov_dic.each do |line|
+    beginning = ['え！？　嘘でしょ？　もー、信じらんない！　', 'もー、そんなこと私に聞くの？　', 'しかたないわね、　']
+    @yome_strings = [beginning[rand(beginning.size)]]
+    @yome_strings.push keyword
+    connect_words(@keyword)
+    ending = ['　バカ、死ね、カス！', '　そんなことまで言わせないでよね。', '　わかった？']
+    @yome_strings.push ending[rand(ending.size)]
+    @output = @yome_strings.join
+    @yome_area.buffer.text = "ヨメ> #{@output}"
+    yome_talk
+  end
+
+  # def yome_words(keyword)
+    # connect_words(@selected_mkv_dic, keyword)
+    # if keyword != @new_keyword
+    #  connect_words(@markov_dic, keyword)
+    # end
+  # end
+
+  def connect_words(keyword)
+    puts "keyword B is #{keyword}"
+    dictionary = @selected_mkv_dic + @markov_dic.shuffle
+    dictionary.each do |line|
       next unless line[0] == keyword
       puts "line is #{line}"
       # @yome_strings.push line[0]
@@ -154,27 +174,15 @@ class Ui
         @yome_strings.push line[2]
         break
       else
+        @yome_strings.push line[2]
         @new_keyword = line[2]
         break
       end
     end
     if keyword != @new_keyword
-      yome_words(@new_keyword)
+      connect_words(@new_keyword)
     end
   end
-
-  def yome_strings
-    beginning = ['え！？　嘘でしょ？　もー、信じらんない！　', 'もー、そんなこと私に聞くの？　', 'しかたないわね、　']
-    @yome_strings = [beginning[rand(beginning.size)]]
-    yome_words(@keyword)
-    ending = ['　バカ、死ね、カス！', '　そんなことまで言わせないでよね。', '　わかった？']
-    @yome_strings.push ending[rand(ending.size)]
-    @output = @yome_strings.join
-    @yome_area.buffer.text = "ヨメ> #{@output}"
-    yome_talk
-  end
-
-
 
   #### OpenJtalkで音声を出す。
   def yome_talk
