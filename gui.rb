@@ -30,18 +30,20 @@ class Ui
     #win.decorated = false
     ## 常に最前面に表示する
     #win.keep_above = true
-
-    color = Gdk::RGBA.new(1.0, 0.75, 1.0, 0.75)
-    win.override_background_color(0, color)
+    # color = Gdk::RGBA.new(1.0, 0.75, 1.0, 0.5)
+    # win.opacity=(1)
+    # win.override_background_color(0, color)
 
     #### 縦の箱を用意
     vbox = Gtk::Box.new(:vertical, 10)
-    vbox.override_background_color(0, color)
+    # vbox.opacity=(1)
+    # vbox.override_background_color(0, color)
 
     #### 上から画像、無脳ちゃん（仮）の言葉、こちらの入力欄を置く
     #ibox = Gdk::Pixbuf.new(file: 'yome.png', has_alpha: true, width: 400, height: 400)
     ibox = Gtk::Image.new(file: 'yome.png')
-    ibox.override_background_color(0, color)
+    # ibox.opacity=(1)
+    # ibox.override_background_color(0, color)
 
     @yome_area = Gtk::TextView.new
     @yome_area.set_size_request(380, -1)
@@ -142,11 +144,12 @@ class Ui
         @noun_relation.include?(sub_item) && @selected_mkv_dic.push(item)
       end
     end
-    pp @selected_mkv_dic
+    pp @selected_mkv_dic.uniq!
 
     beginning = ['え！？　嘘でしょ？　もー、信じらんない！　', 'もー、そんなこと私に聞くの？　', 'しかたないわね、　']
     @yome_strings = [beginning[rand(beginning.size)]]
     @yome_strings.push keyword
+    @before_size = @yome_strings.size
     connect_words(@keyword)
     ending = ['　バカ、死ね、カス！', '　そんなことまで言わせないでよね。', '　わかった？']
     @yome_strings.push ending[rand(ending.size)]
@@ -163,26 +166,36 @@ class Ui
   # end
 
   def connect_words(keyword)
-    puts "keyword B is #{keyword}"
-    dictionary = @selected_mkv_dic + @markov_dic.shuffle
-    dictionary.each do |line|
-      next unless line[0] == keyword
-      puts "line is #{line}"
-      # @yome_strings.push line[0]
-      @yome_strings.push line[1]
-      if line[2] == '。' || line[2] == '？' || line[2] == '！'
-        @yome_strings.push line[2]
-        break
-      else
-        @yome_strings.push line[2]
-        @new_keyword = line[2]
-        break
+    if @before_size != @after_size
+      puts "size before #{@before_size}"
+      @before_size = @after_size
+      puts "keyword B is #{keyword}"
+      dictionary = @selected_mkv_dic + @markov_dic.shuffle
+      dictionary.each do |line|
+        ## 辞書の最初の言葉がキーワードと一致するまで飛ばす。
+        next unless line[0] == keyword
+        ## たいしょうがないのに無限ループするのを防ぐ。
+        # @yome_strings.push line[0]
+        puts "Line is #{line}"
+        @yome_strings.push line[1]
+        if line[2] == '。' || line[2] == '？' || line[2] == '！'
+          @yome_strings.push line[2]
+          break
+        else
+          @yome_strings.push line[2]
+          @after_size = @yome_strings.size
+          @new_keyword = line[2]
+          @selected_mkv_dic.delete(line)
+          puts "size after #{@after_size}"
+          break
+        end
       end
-    end
-    if keyword != @new_keyword
       connect_words(@new_keyword)
+      ## キーワードが変わっていないといいうことは、ループされていないということなので終了。
+      # if keyword != @new_keyword
+      # end
     end
-  end
+    end
 
   #### OpenJtalkで音声を出す。
   def yome_talk
