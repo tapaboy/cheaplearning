@@ -128,24 +128,13 @@ class Ui
     end
     @trigger = ore_words[rand(ore_words.size)]
     @noun_dic.push(ore_words)
-    @keyword = noun_chooser(@noun_dic, @trigger) || ore_words[rand(ore_words.size)]
+    @keyword = noun_chooser(@noun_dic, @trigger) || @trigger
     puts "keyword A is #{@keyword}"
   end
 
   #### 無脳ちゃんの言葉を作成する。
   #### なお、ときどきあるはずのない引数を受け取って突然死するのを防止するため(*)で引数を取れるようにする。
-
   def yome_strings(keyword)
-    #pp @noun_relation
-    ## 特定の単語を含む配列をみつける
-    @selected_mkv_dic = []
-    @markov_dic.each do |item|
-      item.each do |sub_item|
-        @noun_relation.include?(sub_item) && @selected_mkv_dic.push(item)
-      end
-    end
-    pp @selected_mkv_dic.uniq!
-
     beginning = ['え！？　嘘でしょ？　もー、信じらんない！　', 'もー、そんなこと私に聞くの？　', 'しかたないわね、　']
     @yome_strings = [beginning[rand(beginning.size)]]
     @yome_strings.push keyword
@@ -158,18 +147,14 @@ class Ui
     yome_talk
   end
 
-  # def yome_words(keyword)
-    # connect_words(@selected_mkv_dic, keyword)
-    # if keyword != @new_keyword
-    #  connect_words(@markov_dic, keyword)
-    # end
-  # end
-
   def connect_words(keyword)
+    ## @yome_stringsの長さがループ後に変わっていなければ、もう追加できる言葉がないと判断する。
     if @before_size != @after_size
       puts "size before #{@before_size}"
       @before_size = @after_size
       puts "keyword B is #{keyword}"
+
+      make_selected_mkv_dic
       dictionary = @selected_mkv_dic + @markov_dic.shuffle
       dictionary.each do |line|
         ## 辞書の最初の言葉がキーワードと一致するまで飛ばす。
@@ -190,12 +175,21 @@ class Ui
           break
         end
       end
+      ## 新たなキーワードで再帰処理
       connect_words(@new_keyword)
-      ## キーワードが変わっていないといいうことは、ループされていないということなので終了。
-      # if keyword != @new_keyword
-      # end
     end
+  end
+
+  ## 特定の単語を含む配列をみつける
+  def make_selected_mkv_dic
+    @selected_mkv_dic = []
+    @markov_dic.each do |item|
+      item.each do |sub_item|
+        @noun_relation.include?(sub_item) && @selected_mkv_dic.push(item)
+      end
     end
+    pp @selected_mkv_dic.uniq!
+  end
 
   #### OpenJtalkで音声を出す。
   def yome_talk
