@@ -8,11 +8,9 @@ require_relative 'noun'
 #### Ui クラスを定義
 class Ui
   def initialize
-    super
     @markov_dic = YAML.load_file 'MARKOV_DIC.yaml'
     @noun_dic = YAML.load_file 'NOUN_DIC.yaml'
   rescue
-    super
     @markov_dic = []
     @noun_dic = []
   end
@@ -75,6 +73,7 @@ class Ui
   def ore_imput
     @ore_area.signal_connect('activate') do |e|
       @entry = e.text
+      ## ばいばいかバイバイだったら辞書を保存して終了。
       if @entry == 'バイバイ' || @entry == 'ばいばい'
         YAML.dump(@markov_dic, File.open('MARKOV_DIC.yaml', 'w'))
         YAML.dump(@noun_dic, File.open('NOUN_DIC.yaml', 'w'))
@@ -83,14 +82,17 @@ class Ui
         yome_talk
         exit
       end
+      ## 通常の文章なら、次のメソッドを実行。
       ore_strings
       yome_strings(@keyword)
+      ## 入力欄を空にする。
       e.text = ''
     end
   end
 
-  #### 人の入力からマルコフ辞書を作成する。
+  ## いろいろやって、@keywordを返す。
   def ore_strings
+    #### 人の入力からマルコフ辞書を作成する。
     ## 単語分割し、配列に代入
     @parse_ore = Natto::MeCab.new
     parsed_str = []
@@ -98,7 +100,6 @@ class Ui
       parsed_str.push line.surface
     end
     ## 不要な記号を抜く。
-#      parsed_str.delete('、')
     parsed_str.delete('「')
     parsed_str.delete('」')
     parsed_str.delete('　')
@@ -114,39 +115,53 @@ class Ui
       parsed_str.shift
     end
     @markov_dic.uniq!
-    @markov_dic.shuffle!
     ore_noun
   end
 
   ## 嫁の返事のキーワードとなる名詞をランダムに抜き出す。
   def ore_noun
+    ## このあとpushするので、配列であることをからかじめ明示する必要がある。
     ore_words = []
     @parse_ore.parse(@entry) do |line|
+      ## featurで品詞が名詞である場合は、
       if line.feature =~ /固有名詞/ || line.feature =~ /名詞,サ変接続/ || line.feature =~ /名詞,一般/
+        ## surfaceして、単語を登録していく。
         ore_words.push line.surface
       end
     end
     @trigger = ore_words[rand(ore_words.size)]
     @noun_dic.push(ore_words)
+    ## noun_chooserは別ファイルのメソッド。
+    ## 最終的には、yome_stringsに渡す@keywordを返す。
     @keyword = noun_chooser(@noun_dic, @trigger) || @trigger
+    make_selected_mkv_dic
     puts "keyword A is #{@keyword}"
   end
 
   #### 無脳ちゃんの言葉を作成する。
   #### なお、ときどきあるはずのない引数を受け取って突然死するのを防止するため(*)で引数を取れるようにする。
   def yome_strings(keyword)
-    beginning = ['え！？　嘘でしょ？　もー、信じらんない！　', 'もー、そんなこと私に聞くの？　', 'しかたないわね、　']
+    beginning = ['え！？　嘘でしょ？　もー、信じらんない！　',
+                 'もー、そんなこと私に聞くの？　',
+                 'しかたないわね、　',
+                 '']
     @yome_strings = [beginning[rand(beginning.size)]]
     @yome_strings.push keyword
+    ## 後のループ抜け出し判定のため、@yome_stringsの要素数を控えておく。
     @before_size = @yome_strings.size
+    ## 順調にループしている間は、connect_wordsを実行する。
     connect_words(@keyword)
-    ending = ['　バカ、死ね、カス！', '　そんなことまで言わせないでよね。', '　わかった？']
+    ending = ['　バカ、死ね、カス！',
+              '　そんなことまで言わせないでよね。',
+              '　わかった？',
+              '']
     @yome_strings.push ending[rand(ending.size)]
     @output = @yome_strings.join
     @yome_area.buffer.text = "ヨメ> #{@output}"
     yome_talk
   end
 
+  ## 条件を満たすまで、再帰的に実行するメソッド。
   def connect_words(keyword)
     ## @yome_stringsの長さがループ後に変わっていなければ、もう追加できる言葉がないと判断する。
     if @before_size != @after_size
@@ -154,37 +169,49 @@ class Ui
       @before_size = @after_size
       puts "keyword B is #{keyword}"
 
-      make_selected_mkv_dic
-      dictionary = @selected_mkv_dic + @markov_dic.shuffle
-      dictionary.each do |line|
-        ## 辞書の最初の言葉がキーワードと一致するまで飛ばす。
-        next unless line[0] == keyword
-        ## たいしょうがないのに無限ループするのを防ぐ。
-        # @yome_strings.push line[0]
-        puts "Line is #{line}"
-        @yome_strings.push line[1]
-        if line[2] == '。' || line[2] == '？' || line[2] == '！'
-          @yome_strings.push line[2]
-          break
-        else
-          @yome_strings.push line[2]
-          @after_size = @yome_strings.size
-          @new_keyword = line[2]
-          @selected_mkv_dic.delete(line)
-          puts "size after #{@after_size}"
-          break
-        end
-      end
+      ## 処理の核心部（別メソッド）
+      connect_words_core(keyword)
       ## 新たなキーワードで再帰処理
       connect_words(@new_keyword)
     end
+    @after_size = 0
   end
 
-  ## 特定の単語を含む配列をみつける
+  ## 無脳ちゃんの言葉を作る核心部。
+  def connect_words_core(keyword)
+    ## 関連性の高そうな言葉から先につなげていくように辞書を結合する。
+    dictionary = @selected_mkv_dic + @markov_dic.shuffle
+    puts "dictionary size is #{dictionary.size}"
+    ## 辞書の最初の言葉がキーワードと一致するまで飛ばす。
+    dictionary.each do |line|
+      ## 対象がないのに無限ループするのを防ぐ。
+      next unless line[0] == keyword
+      puts "Line is #{line}"
+      @yome_strings.push line[1]
+      ## 「ちょうど」。や？などが来たら、そこで終了。
+      if line[2] == '。' || line[2] == '？' || line[2] == '！'
+        @yome_strings.push line[2]
+        break
+      else
+        @yome_strings.push line[2]
+        @after_size = @yome_strings.size
+        @new_keyword = line[2]
+        ## 関連性の高い辞書から、一度使った言葉を廃棄。
+        @selected_mkv_dic.delete(line)
+        puts "new keyword is #{@new_keyword}"
+        puts "size after #{@after_size}"
+        break
+      end
+    end
+  end
+
+  ## 特定の名詞（sub_item）を含む子配列（item）を抜き出して、配列に入れる。
   def make_selected_mkv_dic
     @selected_mkv_dic = []
     @markov_dic.each do |item|
       item.each do |sub_item|
+        ## @noun_relationは、別ファイルのnoun_chooserにより作られた変数。
+        ## @noun_relationに含まれる名詞をひとつづつに対し、小配列に含まれているか判断。
         @noun_relation.include?(sub_item) && @selected_mkv_dic.push(item)
       end
     end
